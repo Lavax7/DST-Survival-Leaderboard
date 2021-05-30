@@ -34,7 +34,7 @@ local uiLeaderboard = Class(Widget, function(self, owner)
 		self:updateLeaderboards()
 	end)
 	self.mainui.leaderboard_bg.overallButton.label = self.mainui.leaderboard_bg.overallButton:AddChild(Text(BUTTONFONT, 35))
-	self.mainui.leaderboard_bg.overallButton.label:SetMultilineTruncatedString("Overall Leaderboard", 2, 200, 200, "", true)
+	self.mainui.leaderboard_bg.overallButton.label:SetMultilineTruncatedString("Highscore Leaderboard", 2, 200, 200, "", true)
 	self.mainui.leaderboard_bg.overallButton.label:SetColour(0,0,0,1)
 	self.mainui.leaderboard_bg.overallButton.label:SetScale(1,0.8,1)
 	

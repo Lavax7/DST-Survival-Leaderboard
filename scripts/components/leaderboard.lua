@@ -111,12 +111,8 @@ function leaderboard:computeLeaderboard(inst)
 		getOverallLeaderboard(self,overallLeaderboard)			
 	end
 	
-	if self.currentDaysSurvived > self.currentMaxDaysSurvived then
-		self.currentMaxDaysSurvived = self.currentDaysSurvived;
-		currentLeaderboard[inst.userid] = {inst:GetDisplayName(), self.currentMaxDaysSurvived, self.deaths}
-
-		getCurrentLeaderboard(self,currentLeaderboard)			
-	end
+	currentLeaderboard[inst.userid] = {inst:GetDisplayName(), self.currentDaysSurvived, self.deaths}
+	getCurrentLeaderboard(self,currentLeaderboard)			
 end
 
 --Death
@@ -126,7 +122,7 @@ function leaderboard:onkilled(inst)
 		self.currentMaxDaysSurvived = inst.components.age:GetAge() - self.lastDeathTime
 		self.deaths = self.deaths + 1;
 		self.currentDaysSurvived = 0;
-		
+		self:computeLeaderboard(inst)		
 	end)
 end
 
