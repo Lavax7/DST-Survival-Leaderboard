@@ -25,7 +25,6 @@ local leaderboard = Class(
 		self.lastDeathTime = 0
 		
 		self.currentDaysSurvived = 0
-		self.currentMaxDaysSurvived = 0
 		
 		self.maxDaysSurvived = 0
 		
@@ -45,6 +44,7 @@ function leaderboard:OnSave()
         deaths = self.deaths,
 		currentDaysSurvived = self.currentDaysSurvived,
 		maxDaysSurvived = self.maxDaysSurvived,
+		lastDeathTime = self.lastDeathTime,
 		currentLeaderboard = currentLeaderboard,
 		overallLeaderboard = overallLeaderboard,
     }
@@ -56,6 +56,7 @@ function leaderboard:OnLoad(data)
     self.deaths = data.deaths or 0
 	self.currentDaysSurvived = data.currentDaysSurvived or 0
 	self.maxDaysSurvived = data.maxDaysSurvived or 0
+	self.lastDeathTime = data.lastDeathTime or 0
 	if TheNet:GetIsServer() then
 		if _G.LEADERRESET then 
 			self:resetLeaderboard()
@@ -69,11 +70,27 @@ function leaderboard:OnLoad(data)
 	end
 end
 
+function leaderboard:clearLeaderboard()
+	currentLeaderboard = {}
+	overallLeaderboard = {}
+	for k, v in pairs(AllPlayers) do
+		overallLeaderboard[v.userid] = {v:GetDisplayName(), v.components.leaderboard.maxDaysSurvived, v.components.leaderboard.deaths}
+		currentLeaderboard[v.userid] = {v:GetDisplayName(), v.components.leaderboard.currentDaysSurvived, v.components.leaderboard.deaths}
+	end
+	getOverallLeaderboard(self,overallLeaderboard)
+	getCurrentLeaderboard(self,currentLeaderboard)
+end
+
 function leaderboard:resetLeaderboard()
 	currentLeaderboard = {}
 	overallLeaderboard = {}
-	getOverallLeaderboard(self,overallLeaderboard)
-	getCurrentLeaderboard(self,currentLeaderboard)
+	for k, v in pairs(AllPlayers) do
+		v.components.leaderboard.deaths = 0
+		v.components.leaderboard.currentDaysSurvived = 0
+		v.components.leaderboard.maxDaysSurvived = 0
+		v.components.leaderboard.lastDeathTime = v.components.age:GetAge()
+		v.components.leaderboard:computeLeaderboard(v)
+	end
 end
 
 --compute days of survival
@@ -103,11 +120,9 @@ function leaderboard:ontimepass(inst)
 end
 function leaderboard:computeLeaderboard(inst)
 	self.currentDaysSurvived = inst.components.age:GetAge() - self.lastDeathTime
-	
-	if self.currentDaysSurvived > self.maxDaysSurvived then
+	if self.currentDaysSurvived >= self.maxDaysSurvived then
 		self.maxDaysSurvived = self.currentDaysSurvived;
 		overallLeaderboard[inst.userid] = {inst:GetDisplayName(), self.maxDaysSurvived, self.deaths}
-
 		getOverallLeaderboard(self,overallLeaderboard)			
 	end
 	
@@ -119,9 +134,7 @@ end
 function leaderboard:onkilled(inst)
     inst:ListenForEvent("death", function(inst, data)
 		self.lastDeathTime = inst.components.age:GetAge();
-		self.currentMaxDaysSurvived = inst.components.age:GetAge() - self.lastDeathTime
 		self.deaths = self.deaths + 1;
-		self.currentDaysSurvived = 0;
 		self:computeLeaderboard(inst)		
 	end)
 end

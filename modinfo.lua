@@ -1,11 +1,11 @@
 name =
 [[Survival Leaderboard]]
 description =
-[[v1.1
+[[v1.2
 Shows how many days all current and previous players of the server have survived.
 ]]
 author = "Lavax, Larethian"
-version = "1.1"
+version = "1.2"
 priority = -1000
 server_filter_tags = {"leaderboard", "survival ranking"}
 

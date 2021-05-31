@@ -15,7 +15,8 @@ Assets = {
     Asset("IMAGE", "images/button/button_bg_inactive.tex"),
 }
 
-GLOBAL.c_resetLeaderboard = function() end
+GLOBAL.c_clearLB = function() end
+GLOBAL.c_resetLB = function() end
 
 AddPlayerPostInit(function(inst)
 	inst.currentLeaderboard = GLOBAL.net_string(inst.GUID,"currentLeaderboard")
@@ -26,11 +27,16 @@ AddPlayerPostInit(function(inst)
 		inst.components.leaderboard:Init(inst)
 	end
 	
-	GLOBAL.c_resetLeaderboard = function()
-	if not GLOBAL.TheNet:GetIsClient() then
-		inst.components.leaderboard:resetLeaderboard()
+	GLOBAL.c_clearLB = function()
+		if not GLOBAL.TheNet:GetIsClient() then
+			inst.components.leaderboard:clearLeaderboard()
+		end
 	end
-end
+	GLOBAL.c_resetLB = function()
+		if not GLOBAL.TheNet:GetIsClient() then
+			inst.components.leaderboard:resetLeaderboard()
+		end
+	end
 end)
 
 local uiLeaderboard = require("widgets/uiLeaderboard")
